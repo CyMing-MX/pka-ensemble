@@ -2,10 +2,11 @@
 
 **版本 1.0 · Windows 10/11 · 无需安装、无需 Python**
 
-pka_replica 是 Rowan Scientific 宏观/微观 pKa 预测工作流的本地开源复刻:
-SMARTS 片段路线 + GFN2-xTB 量子物理路线(+ AIMNet2 神经网络势预优化,
-取决于你下载的包),支持单分子预测、批量 txt/csv、PubChem 名称/CAS 解析、
-物化性质卡、logD/等电点曲线与 xlsx 长表导出。
+pka_replica 是开源的水相有机分子 pKa 预测工具:**位点级(微观)与分子级
+(宏观)两条计算路线**(SMARTS 片段路线 + GFN2-xTB/ALPB 量子物理路线,
+视包版本附 AIMNet2 神经网络势预优化),支持单分子预测、批量 txt/csv、
+PubChem 名称/CAS 解析、物化性质卡、logD/等电点曲线与 xlsx 长表导出。
+方法与精度基准见项目仓库 README。
 
 ---
 

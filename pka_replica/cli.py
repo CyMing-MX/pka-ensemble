@@ -20,7 +20,7 @@ from pka_replica.workflow import run_macropka, run_micropka  # noqa: E402
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Rowan macropka/pka replica")
+    ap = argparse.ArgumentParser(description="pka_replica: aqueous micro & macro pKa prediction (microstate ensemble + GFN2-xTB/ALPB)")
     ap.add_argument("smiles")
     ap.add_argument("--backend", default="auto", choices=["auto", "xtb", "sites"])
     ap.add_argument("--micro", action="store_true", help="site-level micro pKa only")

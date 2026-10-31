@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="utf-8">
-<title>pka_replica — Rowan macropka 复刻</title>
+<title>pka_replica — 水相分子 pKa 预测(微观/宏观)</title>
 <style>
   :root {
     --bg: #f6f8fa; --panel: #ffffff; --border: #d0d7de; --text: #1f2328;
@@ -96,8 +96,7 @@
 <body>
 <header>
   <h1>pka_replica</h1>
-  <span class="sub">labs.rowansci.com 宏观/微观 pKa 预测工作流的本地开源复刻
-  (微态枚举 → 微态自由能 → Boltzmann 配分函数 → 宏观 pKa / pI / logD)</span>
+  <span class="sub">开源水相 pKa 预测:微态系综热力学 + SMARTS 片段 / GFN2-xTB 物理路线(可选 AIMNet2 预优化) → 宏观 pKa / pI / logD</span>
   <span class="refs">
     <a class="reflink" href="https://xundrug.cn/molgpka" target="_blank" rel="noopener"
        title="MolGpKa:基于图神经网络的 pKa 预测(药物所在线工具,可交叉验证)">MolGpka ↗</a>
@@ -230,10 +229,9 @@
 </main>
 
 <footer>
-  原理与实现:<code>D:\zcode_rea\pka_replica\README.md</code> ·
-  对应 Rowan 文档:<a href="https://docs.rowansci.com/workflows/pka">pka</a> /
-  <a href="https://docs.rowansci.com/science/workflows/macropka">macropka</a> ·
-  热力学框架:Uni-pKa (Luo et al., JACS Au) / Starling (Wagen et al., 2025)
+  方法与精度基准见 <a href="https://github.com/CyMing-MX/pka_replica">GitHub 仓库</a> ·
+  热力学框架:Uni-pKa (Luo et al., JACS Au) / Starling (Wagen et al., 2025) ·
+  引擎:GFN2-xTB/ALPB (xtb) · AIMNet2 (isayevlab)
 </footer>
 
 <script>

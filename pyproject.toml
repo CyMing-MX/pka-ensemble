@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pka-replica"
 version = "0.6.0"
-description = "Local replica of Rowan's macroscopic/microscopic pKa workflows (microstate enumeration -> GFN2-xTB/ALPB energies -> Boltzmann partition)"
+description = "Aqueous micro & macro pKa prediction: microstate ensemble thermodynamics + GFN2-xTB/ALPB physics, with optional AIMNet2 preoptimization"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
