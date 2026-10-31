@@ -61,3 +61,4 @@ __pycache__/
 build/
 dist/
 .venv/
+packaging/auth*_exit.txt
