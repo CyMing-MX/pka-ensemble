@@ -1,0 +1,33 @@
+name	resolved_via	smiles	chemA	chemB	ourA	ourB	errA	errB	chem_pI	our_pI	err_pI	note
+Oxaliplatin	Oxaliplatin	C1CC[C@H]([C@@H](C1)[NH-])[NH-].C(=O)(C(=O)O)O.[Pt+2]	-10.74	7.79	None	None			None	None		输入含 3 个独立片段(盐/混合物),已取最大片段 [NH-][C@@H]1CC;无酸性位点;无碱性位点
+Carboplatin	Carboplatin	C1CC(C1)(C(=O)O)C(=O)O.[NH2-].[NH2-].[Pt+2]	-7.58	None	1.667	None	9.25		None	None		输入含 4 个独立片段(盐/混合物),已取最大片段 O=C(O)C1(C(=O);无碱性位点
+Pemetrexed	Pemetrexed	C1=CC(=CC=C1CCC2=CNC3=C2C(=O)NC(=N3)N)C(=O)N[C@@H](CCC(=O)O)C(=O)O	4.04	2.48	2.108	4.13	-1.93	1.65	4.38	3.101	-1.28	
+Capmatinib	Capmatinib	CNC(=O)C1=C(C=C(C=C1)C2=NN3C(=CN=C3N=C2)CC4=CC5=C(C=C4)N=CC=C5)F	12.77	4.95	12.397	5.225	-0.37	0.27	8.86	8.815	-0.04	
+Dacomitinib	Dacomitinib	COC1=C(C=C2C(=C1)N=CN=C2NC3=CC(=C(C=C3)F)Cl)NC(=O)/C=C/CN4CCCCC4	12.5	8.55	10.635	5.462	-1.87	-3.09	10.53	8.054	-2.48	
+Tepotinib	Tepotinib	CN1CCC(CC1)COC2=CN=C(N=C2)C3=CC=CC(=C3)CN4C(=O)C=CC(=N4)C5=CC=CC(=C5)C#N	None	9.33	None	9.909		0.58	None	None		无酸性位点
+Rociletinib	Rociletinib	CC(=O)N1CCN(CC1)C2=CC(=C(C=C2)NC3=NC=C(C(=N3)NC4=CC(=CC=C4)NC(=O)C=C)C(F)(F)F)OC	13.83	3.99	11.495	4.063	-2.34	0.07	9.05	7.889	-1.16	
+Neratinib	Neratinib	CCOC1=C(C=C2C(=C1)N=CC(=C2NC3=CC(=C(C=C3)OCC4=CC=CC=N4)Cl)C#N)NC(=O)/C=C/CN(C)C	12.55	8.81	11.26	5.386	-1.29	-3.42	10.68	8.332	-2.35	
+Canertinib	Canertinib	C=CC(=O)NC1=C(C=C2C(=C1)C(=NC=N2)NC3=CC(=C(C=C3)F)Cl)OCCCN4CCOCC4	12.54	6.87	10.578	7.232	-1.96	0.36	9.72	8.918	-0.8	
+Almonertinib	Almonertinib	CN(C)CCN(C)C1=CC(=C(C=C1NC(=O)C=C)NC2=NC=CC(=N2)C3=CN(C4=CC=CC=C43)C5CC5)OC	13.64	8.87	13.737	10.267	0.1	1.4	11.25	12.145	0.89	
+Irinotecan	Irinotecan	CCC1=C2CN3C(=CC4=C(C3=O)COC(=O)[C@@]4(CC)O)C2=NC5=C1C=C(C=C5)OC(=O)N6CCC(CC6)N7CCCCC7	11.71	9.17	11.484	9.123	-0.23	-0.05	10.44	10.303	-0.14	
+Afatinib	Afatinib	CN(C)C/C=C/C(=O)NC1=C(C=C2C(=C1)C(=NC=N2)NC3=CC(=C(C=C3)F)Cl)O[C@H]4CCOC4	12.49	8.81	10.446	5.244	-2.04	-3.57	10.65	7.852	-2.8	
+Icotinib	Icotinib	C#CC1=CC(=CC=C1)NC2=NC=NC3=CC4=C(C=C32)OCCOCCOCCO4	None	5.24	10.589	5.216		-0.02	None	7.912		
+Erlotinib	Erlotinib	COCCOC1=C(C=C2C(=C1)C(=NC=N2)NC3=CC=CC(=C3)C#C)OCCOC	None	5.24	11.552	7.97		2.73	None	9.762		
+Gefitinib	Gefitinib	COC1=C(C=C2C(=C1)N=CN=C2NC3=CC(=C(C=C3)F)Cl)OCCCN4CCOCC4	None	6.86	10.437	9.861		3.0	11.35	10.199	-1.15	
+Imatinib	Imatinib	CC1=C(C=C(C=C1)NC(=O)C2=CC=C(C=C2)CN3CCN(CC3)C)NC4=NC=CC(=N4)C5=CN=CC=C5	12.69	8.2	12.564	9.919	-0.13	1.72	10.41	11.277	0.87	
+N-Desmethylimatinib	N-Desmethylimatinib	CC1=C(C=C(C=C1)NC(=O)C2=CC=C(C=C2)CN3CCNCC3)NC4=NC=CC(=N4)C5=CN=CC=C5	12.69	9.23	12.967	9.445	0.28	0.21	10.95	11.225	0.28	
+Alectinib	Alectinib	CCC1=CC2=C(C=C1N3CCC(CC3)N4CCOCC4)C(C5=C(C2=O)C6=C(N5)C=C(C=C6)C#N)(C)C	12.18	8.09	10.411	8.077	-1.77	-0.01	10.14	9.244	-0.9	
+Doxorubicin	Doxorubicin	C[C@H]1[C@H]([C@H](C[C@@H](O1)O[C@H]2C[C@@](CC3=C2C(=C4C(=C3O)C(=O)C5=C(C4=O)C(=CC=C5)OC)O)(C(=O)CO)O)N)O	8.97	10.93	7.771	None	-1.2		9.03	None		无碱性位点
+Epirubicin	Epirubicin	C[C@H]1[C@@H]([C@H](C[C@@H](O1)O[C@H]2C[C@@](CC3=C2C(=C4C(=C3O)C(=O)C5=C(C4=O)C(=CC=C5)OC)O)(C(=O)CO)O)N)O	8.97	10.93	6.047	None	-2.92		9.03	None		无碱性位点
+Vincristine	Vincristine	CC[C@@]1(C[C@@H]2C[C@@](C3=C(CCN(C2)C1)C4=CC=CC=C4N3)(C5=C(C=C6C(=C5)[C@]78CCN9[C@H]7[C@@](C=CC9)([C@H]([C@@]([C@@H]8N6C=O)(C(=O)OC)O)OC(=O)C)CC)OC)C(=O)OC)O	10.85	8.42	None	8.843		0.42	9.69	3.437	-6.25	无酸性位点
+Thioguanine	Thioguanine	C1=NC2=C(N1)C(=S)N=C(N2)N	10.81	4.54	None	4.512		-0.03	7.67	None		无酸性位点
+Azathioprine	Azathioprine	CN1C=NC(=C1SC2=NC=NC3=C2NC=N3)[N+](=O)[O-]	9.84	3.57	None	3.952		0.38	6.71	None		无酸性位点
+Tamoxifen	Tamoxifen	CC/C(=C(\C1=CC=CC=C1)/C2=CC=C(C=C2)OCCN(C)C)/C3=CC=CC=C3	None	8.76	None	None			None	None		无酸性位点;无碱性位点
+Daunorubicin	Daunorubicin	C[C@H]1[C@H]([C@H](C[C@@H](O1)O[C@H]2C[C@@](CC3=C2C(=C4C(=C3O)C(=O)C5=C(C4=O)C(=CC=C5)OC)O)(C(=O)C)O)N)O	8.97	10.93	6.916	None	-2.05		9.03	None		无碱性位点
+Methotrexate	Methotrexate	CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)N[C@@H](CCC(=O)O)C(=O)O	3.93	5.55	2.002	5.902	-1.93	0.35	4.24	4.555	0.31	
+Vinorelbine	Vinorelbine	CCC1=C[C@H]2C[C@@](C3=C(CN(C2)C1)C4=CC=CC=C4N3)(C5=C(C=C6C(=C5)[C@]78CCN9[C@H]7[C@@](C=CC9)([C@H]([C@@]([C@@H]8N6C)(C(=O)OC)O)OC(=O)C)CC)OC)C(=O)OC	10.88	9.34	None	10.178		0.84	10.1	13.089	2.99	无酸性位点
+Gemcitabine	Gemcitabine	C1=CN(C(=O)N=C1N)[C@H]2C([C@@H]([C@H](O2)CO)O)(F)F	11.52	3.05	12.298	4.161	0.78	1.11	7.28	8.229	0.95	
+Cytarabine	Cytarabine	C1=CN(C(=O)N=C1N)[C@H]2[C@H]([C@@H]([C@H](O2)CO)O)O	12.55	3.59	12.72	5.334	0.17	1.74	8.06	9.027	0.97	
+Apatinib	Apatinib	CS(=O)(=O)O.C1CCC(C1)(C#N)C2=CC=C(C=C2)NC(=O)C3=C(N=CC=C3)NCC4=CC=NC=C4	15.24	5.41	None	5.34		-0.07	10.36	10.408	0.05	输入含 2 个独立片段(盐/混合物),已取最大片段 N#CC1(c2ccc(NC;无酸性位点
+Crizotinib	Crizotinib	C[C@H](C1=C(C=CC(=C1Cl)F)Cl)OC2=C(N=CC(=C2)C3=CN(N=C3)C4CCNCC4)N	None	10.06	None	10.389		0.33	None	13.195		无酸性位点
+Osimertinib	Osimertinib	CN1C=C(C2=CC=CC=C21)C3=NC(=NC=C3)NC4=C(C=C(C(=C4)NC(=O)C=C)N(C)CCN(C)C)OC	13.64	8.87	None	11.851		2.98	11.25	13.49	2.24	无酸性位点

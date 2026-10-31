@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>pka_replica — Rowan macropka 复刻</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --panel: #ffffff; --border: #d0d7de; --text: #1f2328;
+    --muted: #57606a; --accent: #0969da; --green: #1a7f37; --yellow: #9a6700;
+    --red: #cf222e; --purple: #8250df; --plot: #ffffff; --grid: #eaeef2;
+    --plot-text: #57606a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font-family: -apple-system, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; }
+  header { padding: 18px 28px; border-bottom: 1px solid var(--border);
+           display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; background: var(--panel); }
+  header h1 { font-size: 20px; margin: 0; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  header .refs { margin-left: auto; display: flex; gap: 8px; align-self: center; }
+  .reflink { display: inline-block; padding: 6px 13px; font-size: 12.5px;
+    color: var(--muted); border: 1px solid var(--border); border-radius: 999px;
+    text-decoration: none; background: var(--bg); transition: color .15s, border-color .15s; }
+  .reflink:hover { color: var(--accent); border-color: var(--accent); }
+  main { padding: 20px 28px; max-width: 1280px; margin: 0 auto; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  input[type=text] { flex: 1; min-width: 300px; padding: 10px 12px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 15px; }
+  select { padding: 9px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); font-size: 14px; }
+  .winbox { width: 110px; flex: none; }
+  button { padding: 10px 22px; border-radius: 6px; border: none; cursor: pointer;
+    background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .err { color: var(--red); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+          padding: 16px 18px; margin-bottom: 18px; }
+  .card h3 { margin: 0 0 12px; font-size: 15px; color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border);
+           color: var(--text); vertical-align: middle; }
+  th { color: var(--muted); font-weight: 600; }
+  code, .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 12px;
+          border: 1px solid var(--border); color: var(--text); margin: 1px; cursor: pointer;
+          background: var(--panel); }
+  .stat { font-size: 26px; font-weight: 700; }
+  .statlabel { color: var(--muted); font-size: 12px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12.5px; margin-top: 10px; color: var(--text); }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; }
+  footer { color: var(--muted); font-size: 12px; padding: 14px 28px; border-top: 1px solid var(--border); }
+  a { color: var(--accent); }
+  .hidden { display: none; }
+  /* batch sidebar (Chemicalize-style) */
+  #batchBar { position: fixed; left: 0; top: 0; bottom: 0; width: 256px;
+    overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border);
+    z-index: 10; padding: 12px 10px; display: none; }
+  body.withbar { padding-left: 268px; }
+  #batchBar h4 { margin: 0 0 4px; font-size: 13.5px; color: var(--accent); }
+  #batchProg { font-size: 12px; color: var(--muted); display: block; margin-bottom: 8px; }
+  .bitem { background: var(--bg); border: 1.6px solid var(--border); border-radius: 8px;
+    padding: 6px; margin-bottom: 8px; cursor: pointer; }
+  .bitem:hover { border-color: var(--accent); }
+  .bitem.active { border-color: var(--accent); background: #eaf2fc; }
+  .bitem svg { width: 100%; height: 92px; display: block; }
+  .bitem .bname { font-size: 11.5px; color: var(--text); margin-top: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bitem .bstatus { font-size: 11px; margin-top: 2px; }
+  button.mini { padding: 5px 10px; font-size: 12px; background: var(--panel);
+    color: var(--text); border: 1px solid var(--border); cursor: pointer; }
+  button.mini:hover { border-color: var(--accent); }
+  .st-queued { color: var(--muted); } .st-running { color: var(--yellow); }
+  .st-done { color: var(--green); } .st-failed { color: var(--red); }
+
+  /* dominant-microstate thumbnails */
+  #domStrip { display: flex; flex-wrap: wrap; gap: 12px; align-content: flex-start; }
+  .dcard { background: var(--panel); border: 1.6px solid var(--border); border-radius: 10px;
+           padding: 8px 10px; width: 212px; }
+  .dcard svg { width: 100%; height: 136px; display: block; }
+  .dcard .cap { font-size: 12.5px; color: var(--text); margin-top: 6px; line-height: 1.5; }
+  .dcard .cap b { font-size: 13.5px; }
+  /* site pair images */
+  .paircell { display: flex; align-items: center; gap: 4px; }
+  .paircell svg { width: 150px; height: 106px; display: block; }
+  .arrow { color: var(--muted); font-size: 18px; }
+  /* hover tooltip for the distribution chart */
+  #popWrap { position: relative; }
+  #popTip { position: absolute; pointer-events: none; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    font-size: 12.5px; color: var(--text); box-shadow: 0 4px 14px rgba(31,35,40,.14);
+    z-index: 5; min-width: 150px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<header>
+  <h1>pka_replica</h1>
+  <span class="sub">labs.rowansci.com 宏观/微观 pKa 预测工作流的本地开源复刻
+  (微态枚举 → 微态自由能 → Boltzmann 配分函数 → 宏观 pKa / pI / logD)</span>
+  <span class="refs">
+    <a class="reflink" href="https://xundrug.cn/molgpka" target="_blank" rel="noopener"
+       title="MolGpKa:基于图神经网络的 pKa 预测(药物所在线工具,可交叉验证)">MolGpka ↗</a>
+    <a class="reflink" href="https://www.swissadme.ch/index.php" target="_blank" rel="noopener"
+       title="SwissADME:ADME/类药性在线计算(Swiss Institute of Bioinformatics)">SwissADME ↗</a>
+  </span>
+</header>
+
+<div id="batchBar">
+  <div id="histSection">
+    <h4>历史记录 <button class="mini" style="margin-left:6px"
+        onclick="exportHistory()" title="导出全部历史分子的 LogD 与等电点长表">导出 xlsx</button></h4>
+    <span style="font-size:11px;color:var(--muted);display:block;margin-bottom:8px">
+      点击免重算直接查看;清空于服务重启</span>
+    <div id="histList"></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+  </div>
+  <div id="batchSection" style="display:none">
+    <h4>批量结果 <button class="mini" style="margin-left:6px"
+        onclick="exportBatch()" title="导出全部已完成分子的 LogD 与等电点长表">导出 xlsx</button></h4>
+    <span id="batchProg"></span>
+    <div id="batchList"></div>
+  </div>
+</div>
+
+<main>
+  <div class="row">
+    <input id="smiles" type="text" placeholder="SMILES,例如 NCC(=O)O (甘氨酸) / C1CNCCN1 (哌嗪) / CC(=O)Oc1ccccc1C(=O)O (阿司匹林)" value="c1ccccc1O">
+    <select id="backend">
+      <option value="auto">backend: auto</option>
+      <option value="xtb">xtb — GFN2-xTB/ALPB 物理 (需 xtb)</option>
+      <option value="sites">sites — SMARTS 片段库 (无依赖)</option>
+    </select>
+    <button id="go" onclick="predict()">预测 pKa</button>
+    <input type="file" id="batchFile" accept=".txt,.csv,.smi,.csv.txt" style="display:none" onchange="onBatchFile(this)">
+    <button id="batchBtn" onclick="document.getElementById('batchFile').click()" title="每行一个 SMILES;也支持逗号/分号/制表符分隔的 csv(name,smiles)">批量 txt/csv</button>
+  </div>
+  <div class="row">
+    <span class="sub" style="font-size:12.5px;color:var(--muted)">
+      快捷:
+      <span class="pill" onclick="setSmiles('CC(=O)O')">乙酸 4.76</span>
+      <span class="pill" onclick="setSmiles('c1ccccc1O')">苯酚 9.99</span>
+      <span class="pill" onclick="setSmiles('c1ccncc1')">吡啶 5.23</span>
+      <span class="pill" onclick="setSmiles('c1ncc[nH]1')">咪唑 6.95</span>
+      <span class="pill" onclick="setSmiles('c1ccccc1N')">苯胺 4.63</span>
+      <span class="pill" onclick="setSmiles('NCC(=O)O')">甘氨酸 2.34/9.60</span>
+      <span class="pill" onclick="setSmiles('C1CNCCN1')">哌嗪 9.82/5.35</span>
+      <span class="pill" onclick="setSmiles('CC(C)Cc1ccc(cc1)C(C)C(=O)O')">布洛芬 4.43</span>
+    </span>
+  </div>
+  <div id="err" class="err hidden"></div>
+  <div id="status" style="color:var(--yellow)"></div>
+
+  <div id="results" class="hidden">
+    <div class="row" style="margin-bottom:8px">
+      <button class="mini" onclick="exportCurrent()"
+              title="导出当前分子的 LogD(pH 0-14)与平均电荷两张长表">导出本分子 xlsx</button>
+      <span id="expHint" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+    <div class="card">
+      <h3>电荷级分布 — 每个净电荷一条曲线 <span style="color:var(--muted);font-weight:400;font-size:12.5px">(细线为该级内的各微态;悬停查看数值与微态明细)</span></h3>
+      <div class="grid" style="grid-template-columns: 1.15fr 1fr">
+        <div>
+          <div id="popWrap">
+            <div id="popChart"></div>
+            <div id="popTip" class="hidden"></div>
+          </div>
+          <div class="legend" id="popLegend"></div>
+        </div>
+        <div id="domStrip"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>宏观 pKa(相邻电荷级之间)</h3>
+        <table id="pkaTable"></table>
+        <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+          <div><div class="stat" id="pI">–</div><div class="statlabel">等电点 pI</div></div>
+          <div><div class="stat" id="acidStat">–</div><div class="statlabel">最强酸性 pKa(位点)</div></div>
+          <div><div class="stat" id="baseStat">–</div><div class="statlabel">最强碱性 pKa(共轭酸)</div></div>
+          <div><div class="stat" id="bk">–</div><div class="statlabel">能量后端</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>平均净电荷 ⟨z⟩(pH) <span style="color:var(--muted);font-weight:400;font-size:12.5px">(悬停查看数值)</span></h3>
+        <div id="chgChartWrap" style="position:relative">
+          <div id="chgChart"></div>
+          <div id="chgChartTip" class="hidden" style="position:absolute;pointer-events:none;background:var(--panel);
+            border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--text);
+            box-shadow:0 4px 14px rgba(31,35,40,.14);z-index:5"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>logD(pH) = Σ w<sub>i</sub>·logP<sub>i</sub> (Crippen)
+        <span id="logPBadge" style="display:inline-block;padding:2px 10px;border:1px solid #8250df;
+          border-radius:999px;color:#8250df;font-size:12.5px;font-weight:400">logP –</span>
+        <span style="color:var(--muted);font-weight:400;font-size:12.5px">(紫色虚线 = logP;悬停查看数值)</span></h3>
+      <div id="logdChartWrap" style="position:relative">
+        <div id="logdChart"></div>
+        <div id="logdChartTip" class="hidden" style="position:absolute;pointer-events:none;background:var(--panel);
+          border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--text);
+          box-shadow:0 4px 14px rgba(31,35,40,.14);z-index:5"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>分子物化性质(输入态)</h3>
+      <div id="idLines" class="hidden" style="font-size:13px;line-height:1.9;
+           margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)"></div>
+      <div id="pcSection" class="hidden">
+        <div style="font-size:12.5px;color:var(--accent);font-weight:600;margin:8px 0 6px">
+          PubChem(在线数据,CACTVS 计算描述符)</div>
+        <div class="grid" style="grid-template-columns:repeat(5,1fr)" id="pcGrid"></div>
+      </div>
+      <div id="rdSection" class="hidden">
+        <div style="font-size:12.5px;color:var(--accent);font-weight:600;margin:10px 0 6px">
+          本地计算(RDKit)</div>
+        <div class="grid" style="grid-template-columns:repeat(5,1fr)" id="propGrid"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>微观 pKa(位点级)— 高亮原子为可解离位点</h3>
+      <table id="microTable"></table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  原理与实现:<code>D:\zcode_rea\pka_replica\README.md</code> ·
+  对应 Rowan 文档:<a href="https://docs.rowansci.com/workflows/pka">pka</a> /
+  <a href="https://docs.rowansci.com/science/workflows/macropka">macropka</a> ·
+  热力学框架:Uni-pKa (Luo et al., JACS Au) / Starling (Wagen et al., 2025)
+</footer>
+
+<script>
+const PALETTE = ["#0969da","#1a7f37","#9a6700","#cf222e","#8250df","#0f7f8c",
+                 "#e16f24","#4a9b5e","#b08800","#a4116e","#3a6fd8","#2b8f6e"];
+function setSmiles(s){ document.getElementById('smiles').value = s; predict(); }
+
+// request-generation token: whichever async action started LAST owns the
+// main panel — stale responses are dropped instead of overwriting it
+function nextToken(){ window._reqToken = (window._reqToken || 0) + 1; return window._reqToken; }
+function stale(t){ return t !== window._reqToken; }
+
+async function predict() {
+  const smiles = document.getElementById('smiles').value.trim();
+  const backend = document.getElementById('backend').value;
+  const body = {smiles, backend};
+  const btn = document.getElementById('go');
+  const tok = nextToken();
+  btn.disabled = true;
+  document.getElementById('status').textContent =
+    backend === 'sites' ? '计算中…' : '计算中(GFN2-xTB 优化每个微态,可能需要几秒到几十秒)…';
+  document.getElementById('err').classList.add('hidden');
+  try {
+    const r = await fetch('/api/predict', {method:'POST',
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const data = await r.json();
+    if (stale(tok)) return;
+    if (!data.ok) throw new Error(data.error);
+    render(data);
+    refreshHistory(data.history_id);
+    if (data.resolved) {
+      document.getElementById('smiles').value = data.resolved.smiles;
+      document.getElementById('status').textContent =
+        `已从 PubChem 解析 "${data.resolved.query}" -> ${data.resolved.smiles}` +
+        (data.resolved.cid ? ` (CID ${data.resolved.cid})` : '');
+    } else if (data.from_cache) {
+      document.getElementById('status').textContent = '命中历史缓存,未重新计算';
+    } else {
+      document.getElementById('status').textContent = '';
+    }
+  } catch (e) {
+    if (stale(tok)) return;
+    document.getElementById('err').textContent = '出错: ' + e.message;
+    document.getElementById('err').classList.remove('hidden');
+    document.getElementById('status').textContent = '';
+  } finally {
+    if (!stale(tok)) btn.disabled = false;
+  }
+}
+
+function fmt(x, d=2){ return x===null||x===undefined ? '–' : (+x).toFixed(d); }
+function chargeStr(z){ return z > 0 ? '+' + z : String(z); }
+
+function render(data) {
+  window._last = data;
+  const macro = data.macro, micro = data.micro, levels = data.charge_levels || [];
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('bk').textContent = macro.object_data.energy_backend;
+  document.getElementById('pI').textContent = fmt(macro.isoelectric_point);
+  // physicochemical properties card
+  const PROP_ZH = [["MW","分子量"],["heavy_atoms","重原子数"],["logP_crippen","logP (Crippen,输入态)"],
+    ["TPSA","TPSA (Å²)"],["HBD","氢键供体"],["HBA","氢键受体"],
+    ["rotatable_bonds","可旋转键"],["aromatic_rings","芳香环"],["formal_charge","形式电荷"]];
+  const props = macro.mol_properties || {};
+  // 与 logP_neutral 同源:都是输入态分子的 Crippen logP,卡片和图上虚线必然一致
+  props.logP_crippen = macro.logP_neutral ?? props.logP_crippen;
+
+  // identity lines: always visible (PubChem fields when resolved,
+  // otherwise the input/canonical SMILES and RDKit formula)
+  const resInfo = data.resolved_info || data.resolved || macro.resolved_info;
+  const od = macro.object_data;
+  const idLines = document.getElementById('idLines');
+  let kv;
+  if (resInfo) {
+    kv = [["查询词", od.input_query || resInfo.query],
+          ["IUPAC 名称", resInfo.iupac_name || '–'],
+          ["CAS 号", resInfo.cas || '–'],
+          ["分子式", resInfo.formula || (props && props.formula) || '–'],
+          ["CID", resInfo.cid || '–']];
+  } else {
+    kv = [["输入 SMILES", od.input_query || '–'],
+          ["规范化 SMILES", od.initial_smiles],
+          ["分子式", (props && props.formula) || '–']];
+  }
+  idLines.innerHTML = kv.map(([k, v]) =>
+    `<div><span style="color:var(--muted)">${k}:</span> <b>${v}</b></div>`).join('');
+  for (const w of (macro.warnings || []))
+    idLines.innerHTML += `<div style="color:var(--yellow)">⚠ ${w}</div>`;
+  idLines.classList.remove('hidden');
+
+  // PubChem's own computed descriptors (CACTVS) vs our local RDKit values —
+  // two labeled sections so the sources are comparable at a glance
+  const pcSec = document.getElementById('pcSection');
+  const rdSec = document.getElementById('rdSection');
+  if (resInfo) {
+    const num = v => (v === null || v === undefined) ? '–' : String(v);
+    const pc = [["XLogP", num(resInfo.xlogp)], ["TPSA (Å²)", num(resInfo.tpsa)],
+                ["形式电荷", num(resInfo.charge)], ["氢键供体", num(resInfo.hbd)],
+                ["氢键受体", num(resInfo.hba)], ["可旋转键", num(resInfo.rotb)],
+                ["重原子数", num(resInfo.heavy_atoms)], ["精确质量", num(resInfo.exact_mass)],
+                ["分子量", num(resInfo.mw)], ["复杂度", num(resInfo.complexity)]];
+    document.getElementById('pcGrid').innerHTML = pc.map(([zh, v]) =>
+      `<div><div class="stat" style="font-size:20px">${v}</div>
+       <div class="statlabel">${zh}</div></div>`).join('');
+    pcSec.classList.remove('hidden');
+  } else {
+    pcSec.classList.add('hidden');
+  }
+  if (props && Object.keys(props).length) {
+    document.getElementById('propGrid').innerHTML = PROP_ZH.map(([k, zh]) =>
+      `<div><div class="stat" style="font-size:20px">${props[k] !== undefined ? props[k] : '–'}</div>
+       <div class="statlabel">${zh}</div></div>`).join('');
+    rdSec.classList.remove('hidden');
+  } else {
+    rdSec.classList.add('hidden');
+  }
+
+  document.getElementById('acidStat').textContent = micro.strongest_acid !== null && micro.strongest_acid !== undefined ? fmt(micro.strongest_acid) : '–';
+  document.getElementById('baseStat').textContent = micro.strongest_base !== null && micro.strongest_base !== undefined ? fmt(micro.strongest_base) : '–';
+
+  // macro pKa table
+  let t = '<tr><th>初始电荷</th><th>终态电荷</th><th>宏观 pKa</th></tr>';
+  for (const p of macro.pKa_values)
+    t += `<tr><td>${chargeStr(p.initial_charge)}</td><td>${chargeStr(p.final_charge)}</td><td><b>${fmt(p.pKa)}</b></td></tr>`;
+  document.getElementById('pkaTable').innerHTML = t;
+
+  // micro pKa table with structure pairs
+  let mt = '<tr><th>方向</th><th>原子</th><th>模板</th><th>位点 pKa</th><th>母体(高亮位点) → 共轭结构</th></tr>';
+  const rows = [...(micro.conjugate_bases||[]).map(r=>[r,'去质子(酸)']),
+                ...(micro.conjugate_acids||[]).map(r=>[r,'质子化(碱)'])];
+  for (const [b, dir] of rows) {
+    const im = b.images || {};
+    const img = svg => svg ? `<div class="paircell">${svg}</div>` : '<span class="mono">'+(b.conjugate||'')+'</span>';
+    mt += `<tr><td>${dir}</td><td>${b.atom_index}</td><td>${b.template}</td><td><b>${fmt(b.pKa)}</b></td>
+           <td><div class="paircell">${im.parent_svg || ''}<span class="arrow">→</span>${im.conjugate_svg || ''}</div></td></tr>`;
+  }
+  document.getElementById('microTable').innerHTML = mt;
+
+  drawDominants(macro, levels);
+  drawSimple('logdChart', macro.logD_by_pH, '#9a6700', 'logD', false,
+    (macro.logP_neutral !== null && macro.logP_neutral !== undefined)
+      ? {y: +macro.logP_neutral, label: 'logP ' + (+macro.logP_neutral).toFixed(2)}
+      : null);
+  document.getElementById('logPBadge').textContent =
+    'logP ≈ ' + fmt(macro.logP_neutral, 2);
+  drawSimple('chgChart', macro.average_charge_by_pH, '#0969da', '⟨z⟩', true);
+  bindSimpleHover('logdChart', macro.logD_by_pH, v => `logD = <b>${(+v).toFixed(2)}</b>`);
+  bindSimpleHover('chgChart', macro.average_charge_by_pH, v => `⟨z⟩ = <b>${(+v).toFixed(3)}</b>`);
+}
+
+// ---------- distribution chart: one bold curve per NET CHARGE level ----------
+// (individual microstates stay as faint same-color lines; the legend matches
+//  the structure cards 1:1 — users think in charge levels, not microstates)
+const POP = { macro: null, levels: [], geom: null };
+
+function drawDominants(macro, levels) {
+  POP.macro = macro; POP.levels = levels;
+  const prof = macro.microstate_weights_by_pH;  // [[pH,[w...]],...]
+  const n = prof.length ? prof[0][1].length : 0;
+
+  // per-charge grouping
+  const byCharge = {};
+  macro.microstates.forEach((s, i) => (byCharge[s.charge] = byCharge[s.charge] || []).push(i));
+  const charges = levels.map(l => l.charge);  // sorted desc from server
+  const colorOfCharge = {};
+  charges.forEach((z, k) => { colorOfCharge[z] = PALETTE[k % PALETTE.length]; });
+  const idxToCharge = {};
+  macro.microstates.forEach((s, i) => { idxToCharge[i] = s.charge; });
+
+  const W=620,H=300,L=44,R=12,T=14,B=32;
+  POP.geom = {W,H,L,R,T,B,
+    x0: prof.length?prof[0][0]:0, x1: prof.length?prof[prof.length-1][0]:14};
+  let s = svgOpen(W,H);
+  s += `<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="var(--plot)" stroke="var(--border)"/>`;
+  for(let g=0; g<=5; g++){
+    const y = T+(H-T-B)*g/5, v = (1-g/5).toFixed(1);
+    s += `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="var(--grid)"/>
+          <text x="${L-7}" y="${y+4}" fill="var(--plot-text)" font-size="11" text-anchor="end">${v}</text>`;
+  }
+  for(let p=0;p<=14;p+=2){
+    const x = L+(W-L-R)*(p-POP.geom.x0)/(POP.geom.x1-POP.geom.x0);
+    s += `<text x="${x}" y="${H-9}" fill="var(--plot-text)" font-size="11" text-anchor="middle">${p}</text>`;
+  }
+  s += `<text x="${(L+W-R)/2}" y="${H-1}" fill="var(--plot-text)" font-size="11" text-anchor="middle">pH</text>`;
+  s += `<line id="gline" x1="0" y1="${T}" x2="0" y2="${H-B}" stroke="var(--muted)"
+        stroke-dasharray="4 3" visibility="hidden"/>`;
+  const X = ph => L+(W-L-R)*(ph-POP.geom.x0)/(POP.geom.x1-POP.geom.x0);
+  const Y = w => T+(H-T-B)*(1-w);
+
+  // faint individual microstate lines (same color as their charge level)
+  for (let j = 0; j < n; j++) {
+    const z = idxToCharge[j];
+    if (!charges.includes(z)) continue;
+    let d='';
+    prof.forEach((r,i)=>{ d += (i?'L':'M')+X(r[0]).toFixed(1)+' '+Y(r[1][j]).toFixed(1)+' '; });
+    s += `<path d="${d}" fill="none" stroke="${colorOfCharge[z]}" stroke-width="1" opacity="0.22"/>`;
+  }
+  // bold aggregate curve per charge level
+  for (const z of charges) {
+    const idxs = byCharge[z] || [];
+    let d='';
+    prof.forEach((r,i)=>{
+      let tot=0; idxs.forEach(j=>tot+=r[1][j]);
+      d += (i?'L':'M')+X(r[0]).toFixed(1)+' '+Y(tot).toFixed(1)+' ';
+    });
+    s += `<path d="${d}" fill="none" stroke="${colorOfCharge[z]}" stroke-width="2.4"/>`;
+  }
+  document.getElementById('popChart').innerHTML = s+'</svg>';
+
+  // legend: one entry per charge level (mirrors the cards exactly)
+  const lvByCharge = {};
+  levels.forEach(l => { lvByCharge[l.charge] = l; });
+  document.getElementById('popLegend').innerHTML = charges.map(z => {
+    const l = lvByCharge[z];
+    return `<span><span class="sw" style="background:${colorOfCharge[z]}"></span>电荷 ${chargeStr(z)} · 峰值 ${(l.peak*100).toFixed(0)}%</span>`;
+  }).join('');
+
+  // one card per charge level
+  const strip = document.getElementById('domStrip');
+  strip.innerHTML = levels.map(l=>{
+    const c = colorOfCharge[l.charge];
+    const img = l.svg ? l.svg : `<div class="mono" style="height:136px;display:flex;align-items:center;justify-content:center;font-size:10px">${l.smiles}</div>`;
+    return `<div class="dcard" style="border-color:${c}">
+      ${img}
+      <div class="cap"><b style="color:${c}">电荷 ${chargeStr(l.charge)}</b>
+        · 峰值 <b>${(l.peak*100).toFixed(1)}%</b><br>
+        主导 pH ${l.ph_lo === null ? '–' : l.ph_lo + ' – ' + l.ph_hi}<br>
+        <span style="color:var(--muted);font-size:11.5px">含 ${ (byCharge[l.charge]||[]).length } 个微态,图为该级主导微态</span></div>
+    </div>`;
+  }).join('') || '<span style="color:var(--muted)">无电荷级</span>';
+
+  bindPopHover();
+}
+
+function bindPopHover() {
+  const wrap = document.getElementById('popWrap');
+  const tip = document.getElementById('popTip');
+  const chart = document.getElementById('popChart');
+  if (!wrap || !chart.firstChild) return;
+  const svgEl = chart.firstChild;
+
+  chart.onmousemove = (ev) => {
+    const g = POP.geom; if (!g) return;
+    const {W,H,L,R,T,B,x0,x1} = g;
+    const svgCur = chart.querySelector('svg');
+    const ctm = svgCur && svgCur.getScreenCTM();
+    if (!ctm) return;
+    // exact client -> viewBox mapping (immune to letterboxing/centering)
+    const inv = ctm.inverse();
+    const vb = new DOMPoint(ev.clientX, ev.clientY).matrixTransform(inv);
+    const xs = vb.x;
+    if (xs < L || xs > W-R) { tip.classList.add('hidden'); hideGuide(); return; }
+    const pH = Math.round((x0 + (xs-L)/(W-L-R)*(x1-x0)) * 10) / 10;
+    const prof = POP.macro.microstate_weights_by_pH;
+    const row = prof.find(r => Math.abs(r[0]-pH) < 0.05);
+    if (!row) { tip.classList.add('hidden'); hideGuide(); return; }
+    const w = row[1];
+
+    // per-charge aggregates
+    const byCharge = {};
+    POP.macro.microstates.forEach((s, i) => (byCharge[s.charge] = byCharge[s.charge] || []).push(i));
+    const charges = POP.levels.map(l => l.charge);
+    const colorOfCharge = {};
+    POP.levels.forEach((l,k)=>{ colorOfCharge[l.charge] = PALETTE[k%PALETTE.length]; });
+    let html = `<b>pH = ${row[0].toFixed(1)}</b>`;
+    for (const z of charges) {
+      let tot=0; byCharge[z].forEach(j=>tot+=w[j]);
+      html += `<div style="white-space:nowrap"><span class="sw" style="background:${colorOfCharge[z]}"></span>电荷 ${chargeStr(z)} — <b>${(tot*100).toFixed(1)}%</b></div>`;
+    }
+
+    tip.innerHTML = html;
+    tip.classList.remove('hidden');
+    const px = ev.clientX - wrap.getBoundingClientRect().left + 14;
+    const py = ev.clientY - wrap.getBoundingClientRect().top + 10;
+    tip.style.left = Math.min(px, wrap.clientWidth - 190) + 'px';
+    tip.style.top = Math.min(py, Math.max(wrap.clientHeight - 300, 10)) + 'px';
+    const gl = svgEl.querySelector('#gline');
+    if (gl) {
+      const ypH = L+(W-L-R)*(row[0]-x0)/(x1-x0);
+      gl.setAttribute('x1', ypH); gl.setAttribute('x2', ypH);
+      gl.setAttribute('visibility', 'visible');
+    }
+  };
+  chart.onmouseleave = () => { tip.classList.add('hidden'); hideGuide(); };
+
+  function hideGuide(){
+    const svgEl = document.querySelector('#popChart svg');
+    const gl = svgEl && svgEl.querySelector('#gline');
+    if (gl) gl.setAttribute('visibility', 'hidden');
+  }
+}
+
+// ---------- hover for simple charts (logD, ⟨z⟩) ----------
+function bindSimpleHover(id, series, fmtVal) {
+  const wrap = document.getElementById(id + 'Wrap');
+  const tip = document.getElementById(id + 'Tip');
+  const chart = document.getElementById(id);
+  if (!wrap || !chart.firstChild) return;
+  const svgEl = chart.firstChild;
+  const W=560,H=240,L=44,R=12,T=14,B=32;
+  chart.onmousemove = (ev) => {
+    const svgCur = chart.querySelector('svg');
+    const ctm = svgCur && svgCur.getScreenCTM();
+    if (!ctm) return;
+    const vb = new DOMPoint(ev.clientX, ev.clientY).matrixTransform(ctm.inverse());
+    const xs = vb.x;
+    if (xs < L || xs > W-R) { tip.classList.add('hidden'); return; }
+    const x0=series[0][0], x1=series[series.length-1][0];
+    const pH = (x0 + (xs-L)/(W-L-R)*(x1-x0));
+    // nearest row
+    let best = series[0];
+    for (const r of series) if (Math.abs(r[0]-pH) < Math.abs(best[0]-pH)) best = r;
+    tip.innerHTML = `<b>pH = ${best[0].toFixed(1)}</b><br>${fmtVal(best[1])}`;
+    tip.classList.remove('hidden');
+    const px = ev.clientX - wrap.getBoundingClientRect().left + 14;
+    const py = ev.clientY - wrap.getBoundingClientRect().top + 10;
+    tip.style.left = Math.min(px, wrap.clientWidth - 130) + 'px';
+    tip.style.top = py + 'px';
+  };
+  chart.onmouseleave = () => tip.classList.add('hidden');
+}
+
+function svgOpen(w,h){ return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px">`; }
+
+function drawSimple(id, series, color, label, zeroLine, refLine) {
+  if (!series || !series.length){ document.getElementById(id).innerHTML=''; return; }
+  const W=560,H=240,L=44,R=12,T=14,B=32;
+  const vs = series.map(r=>r[1]);
+  let lo=Math.min(...vs), hi=Math.max(...vs);
+  if (zeroLine){ lo=Math.min(lo,0); hi=Math.max(hi,0); }
+  if (refLine && isFinite(refLine.y)){ lo=Math.min(lo,refLine.y); hi=Math.max(hi,refLine.y); }
+  if (hi===lo){hi+=1;lo-=1;}
+  const pad=(hi-lo)*0.08; hi+=pad; lo-=pad;
+  let s = svgOpen(W,H);
+  s += `<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="var(--plot)" stroke="var(--border)"/>`;
+  for(let g=0; g<=4; g++){
+    const y=T+(H-T-B)*g/4, v=(hi-(hi-lo)*g/4).toFixed(1);
+    s += `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="var(--grid)"/><text x="${L-7}" y="${y+4}" fill="var(--plot-text)" font-size="11" text-anchor="end">${v}</text>`;
+  }
+  const x0=series[0][0], x1=series[series.length-1][0];
+  for(let p=Math.ceil(x0);p<=x1;p+=2){
+    const x=L+(W-L-R)*(p-x0)/(x1-x0);
+    s += `<text x="${x}" y="${H-9}" fill="var(--plot-text)" font-size="11" text-anchor="middle">${p}</text>`;
+  }
+  if (zeroLine){
+    const y=T+(H-T-B)*(hi-0)/(hi-lo);
+    s += `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#cf222e" stroke-dasharray="4 3"/>`;
+  }
+  if (refLine && isFinite(refLine.y)){
+    const y=T+(H-T-B)*(hi-refLine.y)/(hi-lo);
+    s += `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#8250df" stroke-dasharray="6 4" stroke-width="1.5"/>`;
+    s += `<text x="${W-R-4}" y="${y-5}" fill="#8250df" font-size="11" text-anchor="end">${refLine.label}</text>`;
+  }
+  let d='';
+  series.forEach((r,i)=>{
+    const x=L+(W-L-R)*(r[0]-x0)/(x1-x0);
+    const y=T+(H-T-B)*(hi-r[1])/(hi-lo);
+    d += (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';
+  });
+  s += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2"/>`;
+  s += `<text x="${(L+W-R)/2}" y="${H-1}" fill="var(--plot-text)" font-size="11" text-anchor="middle">pH</text>`;
+  document.getElementById(id).innerHTML = s+'</svg>';
+}
+
+// ---------- batch mode (txt/csv upload -> sidebar -> click to view) ----------
+const BSTATUS = {queued: "排队中", running: "计算中…", done: "完成", failed: "失败"};
+
+// ---------------- xlsx export (Chemicalize-style long sheets) ----------------
+async function downloadExport(body) {
+  const r = await fetch('/api/export', {method: 'POST',
+    headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.error || ('HTTP ' + r.status));
+  }
+  const blob = await r.blob();
+  const m = (r.headers.get('Content-Disposition') || '').match(/filename="([^"]+)"/);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = m ? m[1] : 'pka_export.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+async function exportCurrent() {
+  const d = window._last;
+  if (!d || !d.macro) return;
+  const resInfo = d.resolved_info || d.resolved || d.macro.resolved_info || {};
+  const name = resInfo.iupac_name ||
+    (d.resolved && d.resolved.query) ||
+    d.macro.object_data.input_query ||
+    d.macro.object_data.initial_smiles || 'mol';
+  const hint = document.getElementById('expHint');
+  hint.textContent = '生成 xlsx…';
+  try {
+    await downloadExport({rows: [{
+      name,
+      logd: d.macro.logD_by_pH,
+      charge: d.macro.average_charge_by_pH,
+    }]});
+    hint.textContent = '已导出';
+  } catch (e) {
+    hint.textContent = '导出失败: ' + e.message;
+  }
+  setTimeout(() => { hint.textContent = ''; }, 4000);
+}
+
+async function exportBatch() {
+  const b = window._batch;
+  if (!b) return;
+  try {
+    await downloadExport({job_id: b.id});
+  } catch (e) {
+    document.getElementById('batchProg').textContent = '导出失败: ' + e.message;
+  }
+}
+
+async function exportHistory() {
+  if (!_hist.items.length) return;
+  try {
+    await downloadExport({history: true});
+  } catch (e) {
+    document.getElementById('status').textContent = '导出失败: ' + e.message;
+  }
+}
+
+// ---------------- session history sidebar ----------------
+let _hist = {items: [], active: null};
+
+async function refreshHistory(activeId) {
+  try {
+    const r = await fetch('/api/history');
+    const d = await r.json();
+    if (!d.ok) return;
+    _hist.items = d.items;
+    if (activeId) _hist.active = activeId;
+    renderHistSidebar();
+  } catch (e) { /* history is best-effort */ }
+}
+
+function renderHistSidebar() {
+  if (!_hist.items.length) return;
+  document.getElementById('batchBar').style.display = 'block';
+  document.getElementById('histSection').style.display = 'block';
+  document.body.classList.add('withbar');
+  const list = document.getElementById('histList');
+  list.innerHTML = _hist.items.map(it => {
+    const sum = it.summary
+      ? `<div class="bstatus st-done">pKa: ${(it.summary.pKa || [])
+          .map(p => (+p).toFixed(2)).join(' / ') || '–'}
+         ${it.summary.pI !== null && it.summary.pI !== undefined ? ' · pI ' + (+it.summary.pI).toFixed(1) : ''}</div>`
+      : '';
+    return `<div class="bitem ${_hist.active === it.id ? 'active' : ''}"
+              onclick="selectHist('${it.id}')">
+      ${it.svg || ''}<div class="bname" title="${it.smiles}">${it.query}</div>${sum}</div>`;
+  }).join('');
+}
+
+async function selectHist(id) {
+  _hist.active = id;
+  renderHistSidebar();
+  const tok = nextToken();
+  document.getElementById('status').textContent = '加载历史结果…';
+  try {
+    const r = await fetch('/api/history/item?id=' + id);
+    const d = await r.json();
+    if (stale(tok)) return;
+    if (!d.ok) throw new Error(d.error || 'not found');
+    document.getElementById('status').textContent = '';
+    render(d);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch (e) {
+    if (stale(tok)) return;
+    document.getElementById('status').textContent =
+      e.message === 'unknown history id'
+        ? '该历史条目已过期(上限 50 条),请重新计算'
+        : '';
+  }
+}
+
+function onBatchFile(input) {
+  const f = input.files && input.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => startBatch(String(reader.result));
+  reader.readAsText(f);
+  input.value = "";
+}
+
+async function startBatch(text) {
+  const backend = document.getElementById('backend').value;
+  document.getElementById('status').textContent = "批量任务提交中…";
+  try {
+    const r = await fetch('/api/batch/start', {method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text, backend})});
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    document.getElementById('results').classList.add('hidden');
+    document.getElementById('batchBar').style.display = 'block';
+    document.getElementById('batchSection').style.display = 'block';
+    document.body.classList.add('withbar');
+    window._batch = {id: d.job_id, total: d.total, items: null, active: null, done: false};
+    window._batchLoaded = {};  // per-job auto-load bookkeeping
+    if (d.invalid && d.invalid.length)
+      document.getElementById('status').textContent =
+        `已跳过 ${d.invalid.length} 个无效行: ${d.invalid.slice(0,3).join("; ")}`;
+    else
+      document.getElementById('status').textContent = "";
+    pollBatch();
+  } catch (e) {
+    document.getElementById('status').textContent = "";
+    document.getElementById('err').textContent = "批量出错: " + e.message;
+    document.getElementById('err').classList.remove('hidden');
+  }
+}
+
+async function pollBatch() {
+  const b = window._batch;
+  if (!b) return;
+  try {
+    const r = await fetch('/api/batch/status?id=' + b.id);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    b.items = d.items;
+    b.done = d.status === 'done';
+    const doneN = d.items.filter(i => i.status === 'done' || i.status === 'failed').length;
+    document.getElementById('batchProg').textContent =
+      b.done ? `全部完成 (${doneN}/${b.total})` : `进行中 ${doneN}/${b.total}`;
+    renderBatchSidebar();
+    if (b.active !== null) {
+      const it = b.items[b.active];
+      if (it && it.status === 'done' && !window._batchLoaded?.[b.active]) {
+        window._batchLoaded = window._batchLoaded || {};
+        window._batchLoaded[b.active] = true;
+        loadBatchItem(b.active);
+      }
+    }
+    if (!b.done) setTimeout(pollBatch, 2000);
+  } catch (e) { setTimeout(pollBatch, 3000); }
+}
+
+function renderBatchSidebar() {
+  const b = window._batch;
+  if (!b || !b.items) return;
+  const list = document.getElementById('batchList');
+  list.innerHTML = b.items.map((it, i) => {
+    const name = it.name || it.smiles || it.raw || `#${i}`;
+    const thumb = it.svg
+      ? it.svg
+      : `<div style="height:92px;display:flex;align-items:center;justify-content:center;
+           color:var(--muted);font-size:11px">${it.valid ? '…' : '无效 SMILES'}</div>`;
+    const sum = it.summary
+      ? `<div class="bstatus st-done">pKa: ${it.summary.pKa_values
+          .filter(p => p.pKa > -2 && p.pKa < 16).map(p => (+p.pKa).toFixed(2)).join(' / ') || '–'}
+         ${it.summary.isoelectric_point !== null ? ' · pI ' + (+it.summary.isoelectric_point).toFixed(1) : ''}</div>`
+      : `<div class="bstatus st-${it.status}">${it.valid ? BSTATUS[it.status] : '无效 SMILES'}</div>`;
+    return `<div class="bitem ${b.active === i ? 'active' : ''}" onclick="selectBatchItem(${i})">
+      ${thumb}<div class="bname" title="${it.smiles || it.raw}">${name}</div>${sum}</div>`;
+  }).join('');
+}
+
+async function selectBatchItem(i) {
+  const b = window._batch;
+  if (!b || !b.items || !b.items[i] || !b.items[i].valid) return;
+  b.active = i;
+  renderBatchSidebar();
+  const it = b.items[i];
+  if (it.status !== 'done') return;   // pending/failed: nothing to show yet
+  // mark loaded so the 2 s poll does not re-fetch and re-render this item
+  window._batchLoaded = window._batchLoaded || {};
+  window._batchLoaded[i] = true;
+  loadBatchItem(i);
+}
+
+async function loadBatchItem(i) {
+  const b = window._batch;
+  const tok = nextToken();
+  document.getElementById('status').textContent = '加载结果…';
+  try {
+    const r = await fetch(`/api/batch/item?id=${b.id}&index=${i}`);
+    const d = await r.json();
+    if (stale(tok)) return;
+    if (!d.ok) throw new Error(d.error || 'not ready');
+    document.getElementById('status').textContent = '';
+    render(d);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch (e) {
+    if (stale(tok)) return;
+    document.getElementById('status').textContent = '';
+  }
+}
+// page open: show previous session results in the sidebar (no recompute)
+refreshHistory();
+</script>
+</body>
+</html>

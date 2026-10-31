@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pka-replica"
+version = "0.6.0"
+description = "Local replica of Rowan's macroscopic/microscopic pKa workflows (microstate enumeration -> GFN2-xTB/ALPB energies -> Boltzmann partition)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "rdkit",
+    "numpy<3",
+]
+
+[project.optional-dependencies]
+# neural-network geometry engine (recommended; needs an external `xtb` binary too)
+aimnet = ["aimnet[ase]"]
+
+[project.scripts]
+pka-server = "pka_replica.server:main"
+pka-cli = "pka_replica.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["pka_replica*"]
+
+[tool.setuptools.package-data]
+pka_replica = ["web/*.html"]

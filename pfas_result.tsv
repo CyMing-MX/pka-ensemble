@@ -1,0 +1,12 @@
+name	smiles	chemA	ourA_xtb	err_xtb	ourA_frag	err_frag	note
+nonafluorobutane-1-sulfonic acid	C(C(C(F)(F)S(=O)(=O)O)(F)F)(C(F)(F)F)(F)F	-3.31	-2.0	1.31	None		取自未筛位点表(超酸<0)
+tridecafluorohexane-1-sulfonic acid	C(C(C(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(C(C(F)(F)F)(F)F)(F)F	-3.32	-2.0	1.32	None		取自未筛位点表(超酸<0)
+pentadecafluoroheptane-1-sulfonic acid	C(C(C(C(F)(F)F)(F)F)(F)F)(C(C(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F	-3.32	-2.0	1.32	None		取自未筛位点表(超酸<0)
+heptadecafluorooctane-1-sulfonic acid	C(C(C(C(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(C(C(C(F)(F)F)(F)F)(F)F)(F)F	-3.32	-2.0	1.32	None		取自未筛位点表(超酸<0)
+heptafluorobutanoic acid	C(=O)(C(C(C(F)(F)F)(F)F)(F)F)O	0.37	0.115	-0.26	4.3	3.93	
+nonafluoropentanoic acid	C(=O)(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)O	0.34	0.232	-0.11	4.3	3.96	
+undecafluorohexanoic acid	C(=O)(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)O	0.32	0.145	-0.18	4.3	3.98	
+tridecafluoroheptanoic acid	C(=O)(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)O	0.31	0.23	-0.08	4.3	3.99	
+pentadecafluorooctanoic acid	C(=O)(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)O	0.3	-0.1228	-0.42	4.3	4.0	取自未筛位点表(超酸<0)
+heptadecafluorononanoic acid	C(=O)(C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)O	0.29	0.089	-0.2	4.3	4.01	
+nonadecafluorodecanoic acid	C(=O)(C(C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)O	0.4	0.01	-0.39	4.3	3.9	

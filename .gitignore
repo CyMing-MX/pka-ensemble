@@ -1,0 +1,63 @@
+# --- build artifacts / packaging ---
+packaging/dist/
+packaging/build_work/
+packaging/entry_pka.py
+packaging/build.log
+packaging/test.log
+*.spec
+
+# --- third-party datasets (see README for sources; do not redistribute) ---
+pkahub/
+pkasolver/
+checkpoints/
+*.pkl
+*.sdf
+pkahub_all.tsv
+*.xlsx
+
+# --- benchmark / debug outputs ---
+*.log
+lit_test*.txt
+bench_*.txt
+pkahub_*.txt
+pfas_*.txt
+acid_*.txt
+mtx_debug*.txt
+repro_out*.txt
+verify_out.txt
+final_table.txt
+*_debug.txt
+refit_out.txt
+pfa_refit_out.txt
+qupkake_smoke.txt
+salt_test.txt
+sites_probs.txt
+mol_test.txt
+xtbp_debug*.txt
+pkahub_*.html
+pks_readme.md
+acid_analytes_result.tsv
+cas_*.json
+pred_test.json
+site_*.png
+repro_*.png
+fix_*.png
+
+# --- one-off debug scripts (kept only locally) ---
+debug_*.py
+debug_macro.py
+check_templates.py
+cmp_before_after.py
+lit_test2.py
+remove_rows.py
+render_site_pairs.py
+repro_highlight.py
+verify_filters.py
+
+# --- python ---
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
